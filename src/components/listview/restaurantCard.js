@@ -5,7 +5,7 @@ import { styled } from '@mui/system';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const hazardColors = {
-    Low: '#00e676',
+    Low: '#28AE89',
     Medium: '#fbc02d',
     High: '#f44336',
     none: '#b7b8b9'
@@ -15,7 +15,23 @@ const HazardBar = styled('div')(({ hazardLevel }) => ({
     backgroundColor: hazardColors[hazardLevel],
 }));
 
+const hazardText = (hazardLevel) => {
+    switch (hazardLevel){
+        case "Low":
+            return 'Clean :)';
+        case "Medium":
+            return 'Safe :]';
+        case "High":
+            return 'Dangerous :(';
+        default:
+            return 'No report !';
+    }
+    
+}
+
 export const RestaurantCard = ({ name, address, hazardLevel, distance }) => {
+    const hazardAlert= hazardText(hazardLevel);
+    console.log(hazardAlert)
     return (
         <Tilt
             options={{
@@ -30,7 +46,7 @@ export const RestaurantCard = ({ name, address, hazardLevel, distance }) => {
             easing: 'cubic-bezier(.03,.98,.52,.99)',
             }}
         >
-            <Card className=" h-40" style={{ border: "0.5px solid green" }}>
+            <Card className=" h-45" style={{ border: "0.5px solid green" }}>
                 <CardContent>
                     <Typography variant="h5" component="h2">
                         {name}
@@ -39,6 +55,10 @@ export const RestaurantCard = ({ name, address, hazardLevel, distance }) => {
                         {address}
                     </Typography>
                     <HazardBar hazardLevel={hazardLevel} />
+                    
+                    <p className='font-bold text-left' style={{ color: hazardColors[hazardLevel] }}> 
+                        {hazardAlert}
+                    </p>
                     <div style={{ display: 'flex', alignItems: 'center', marginTop: 8 }}>
                         <Typography variant="body2" color="textSecondary" style={{ marginRight: 8 }}>
                         {distance} km

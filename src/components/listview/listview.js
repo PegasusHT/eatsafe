@@ -62,7 +62,6 @@ export const ListView = () => {
             setTotalRestaurants(patchedData);
             setLoading(false);
         }
-        // console.log(totalRestaurants[1])
     }, [reports, totalRestaurants]);
 
     const fetchMoreData = () => {
@@ -100,6 +99,7 @@ export const ListView = () => {
                 <p>Loading data ... </p>
             ):(
                 <InfiniteScroll
+                    className='p-4'
                     dataLength={visibleRes.length}
                     next={fetchMoreData}
                     hasMore={hasMore}
@@ -112,10 +112,9 @@ export const ListView = () => {
                                 = restaurant.properties;
                             
                             let HAZARDRATING = setHazardRating(reports)
-                            console.log(HAZARDRATING)
                             const distanceDefault = '175m';
                             return (
-                                <div className="w-1/3 p-2">
+                                <div className="w-full sm:w-1/2 md:w-1/3 p-2">
                                     <RestaurantCard
                                     name={NAME}
                                     address={PHYSICALADDRESS}
