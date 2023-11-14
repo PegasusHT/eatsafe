@@ -3,6 +3,7 @@ import React from 'react';
 import {Tilt} from 'react-tilt';
 import { styled } from '@mui/system';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useNavigate } from 'react-router-dom';
 
 const hazardColors = {
     Low: '#28AE89',
@@ -29,9 +30,9 @@ const hazardText = (hazardLevel) => {
     
 }
 
-export const RestaurantCard = ({ name, address, hazardLevel, distance }) => {
+export const RestaurantCard = ({ name, address, hazardLevel, distance, trackingNumber }) => {  
+    const navigate = useNavigate();
     const hazardAlert= hazardText(hazardLevel);
-    console.log(hazardAlert)
     return (
         <Tilt
             options={{
@@ -64,7 +65,7 @@ export const RestaurantCard = ({ name, address, hazardLevel, distance }) => {
                         {distance} km
                         </Typography>
                         <p className='pl-24 pr-1'> Details </p>
-                        <ArrowForwardIcon />
+                        <ArrowForwardIcon  onClick={() => navigate(`/details/${trackingNumber}`)}/>
                     </div>
                 </CardContent>
             </Card>

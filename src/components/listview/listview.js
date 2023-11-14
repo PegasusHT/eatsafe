@@ -116,7 +116,8 @@ export const ListView = () => {
                             return (
                                 <div className="w-full sm:w-1/2 md:w-1/3 p-2">
                                     <RestaurantCard
-                                    name={NAME}
+                                    name={NAME}  
+                                    trackingNumber={TRACKINGNUMBER}
                                     address={PHYSICALADDRESS}
                                     hazardLevel={HAZARDRATING}
                                     distance={distanceDefault}
