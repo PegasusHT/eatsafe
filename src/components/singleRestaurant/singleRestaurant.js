@@ -3,6 +3,7 @@ import initRestaurants from '../../data/restaurants.json';
 import axios from 'axios';
 import Papa from 'papaparse';
 import { useParams } from 'react-router-dom';
+import { styled } from '@mui/system';
 
 function patchData(reports, restaurants) {
     let reportHashMap= new Map();
@@ -69,9 +70,23 @@ export const SingleRestaurant = () => {
         return HAZARDRATING
     }
 
+    const HazardBar = styled('div')(({ hazardLevel }) => ({
+        height: '8px',
+        width: '40vw',
+        backgroundColor: hazardColors[hazardLevel],
+    }));
+
+    const hazardColors = {
+        Low: '#28AE89',
+        Medium: '#fbc02d',
+        High: '#f44336',
+        none: '#b7b8b9'
+    };
+
     return(
         <div className="p-4 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4">
             {!loading && totalRestaurants.map((restaurant, index) => {
+                const currReports = restaurant.properties.reports;
                 if(restaurant.properties.TRACKINGNUMBER === trackingNumber) {
                     return (
                         <div key={index}>
@@ -79,9 +94,10 @@ export const SingleRestaurant = () => {
                                 {restaurant.properties.NAME}
                             </div>
                             <p className="text-gray-700 text-base">
-                                <strong>Address :</strong> 
+                                <strong>Address: </strong> 
                                 {restaurant.properties.PHYSICALADDRESS}
                             </p>
+                            <HazardBar hazardLevel={Object.entries(currReports)[0][1].HAZARDRATING} />
                             <div className="overflow-auto h-40 mt-5">
                                 <h2 className="font-bold text-lg mb-2">Inspection reports: </h2>
                                 {restaurant.properties.reports.sort((a, b) => {
