@@ -2,7 +2,9 @@ import initRestaurants from '../../data/restaurants.json';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Papa from 'papaparse';
-import { GoogleMap, useJsApiLoader, Marker, MarkerClusterer } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker, MarkerClusterer, InfoWindowF } from '@react-google-maps/api';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useNavigate } from 'react-router-dom';
 
 function patchData(reports, restaurants) {
   let reportHashMap = new Map();
@@ -36,6 +38,8 @@ export const MapView = () => {
   // eslint-disable-next-line
   const [totalRestaurants, setTotalRestaurants] = useState([]);
   const [reports, setReports] = useState([]);
+  const navigate = useNavigate();
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAP_API_KEY
@@ -76,12 +80,15 @@ export const MapView = () => {
     }
   }, [reports]);
 
-    const hazardColors = {
-        Low: '#28AE89',
-        Medium: '#fbc02d',
-        High: '#f44336',
-        none: '#b7b8b9'
-    };
+  const hazardColors = {
+      Low: '#28AE89',
+      Medium: '#fbc02d',
+      High: '#f44336',
+      none: '#b7b8b9'
+  };
+
+  const [activeMarker, setActiveMarker] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   return isLoaded ? (
     <GoogleMap
@@ -94,15 +101,44 @@ export const MapView = () => {
       <MarkerClusterer averageCenter enableRetinaIcons gridSize={60}>
         {clusterer => 
           totalRestaurants.map(restaurant => {
+            const {TRACKINGNUMBER, LATITUDE, LONGITUDE, NAME, PHYSICALADDRESS, reports} = restaurant.properties;
+            let hazardRating;
+            if(reports)
+              hazardRating=  Object.entries(reports)[0][1].HAZARDRATING;
+            else
+              hazardRating="none"
+            
             return(
               <Marker
-                key={restaurant.properties.TRACKINGNUMBER}
+                key={TRACKINGNUMBER}
                 position={{
-                  lat: parseFloat(restaurant.properties.LATITUDE),
-                  lng: parseFloat(restaurant.properties.LONGITUDE)
+                  lat: parseFloat(LATITUDE),
+                  lng: parseFloat(LONGITUDE)
                 }}
                 clusterer={clusterer}
-              />
+                onClick={() => {
+                  setActiveMarker(restaurant);
+                  setIsOpen(true);
+                }}
+              >
+                {isOpen && activeMarker === restaurant && (
+                  <InfoWindowF 
+                    onCloseClick={() => setIsOpen(false)}
+                  >
+                    <div>
+                    <h2 
+                      className="cursor-pointer underline font-bold"
+                      onClick={() => navigate(`/details/${TRACKINGNUMBER}`)}
+                    >
+                      {NAME}
+                    </h2>
+                      <p>Address: {PHYSICALADDRESS}</p>
+                      <p className='font-bold text-left'> 
+                        Hazard Rating: {hazardRating} </p>
+                    </div>
+                  </InfoWindowF>
+                )}
+              </Marker>
             )
           })
         }
