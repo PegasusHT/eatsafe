@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Papa from 'papaparse';
 import { GoogleMap, useJsApiLoader, Marker, MarkerClusterer, InfoWindowF } from '@react-google-maps/api';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useNavigate } from 'react-router-dom';
 
 function patchData(reports, restaurants) {
   let reportHashMap = new Map();
@@ -36,6 +38,8 @@ export const MapView = () => {
   // eslint-disable-next-line
   const [totalRestaurants, setTotalRestaurants] = useState([]);
   const [reports, setReports] = useState([]);
+  const navigate = useNavigate();
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAP_API_KEY
@@ -122,9 +126,15 @@ export const MapView = () => {
                     onCloseClick={() => setIsOpen(false)}
                   >
                     <div>
-                      <h2>{NAME}</h2>
+                    <h2 
+                      className="cursor-pointer underline font-bold"
+                      onClick={() => navigate(`/details/${TRACKINGNUMBER}`)}
+                    >
+                      {NAME}
+                    </h2>
                       <p>Address: {PHYSICALADDRESS}</p>
-                      <p>Hazard Rating: {hazardRating}</p>
+                      <p className='font-bold text-left'> 
+                        Hazard Rating: {hazardRating} </p>
                     </div>
                   </InfoWindowF>
                 )}
