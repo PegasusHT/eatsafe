@@ -47,7 +47,8 @@ export const RestaurantCard = ({ name, address, hazardLevel, distance, trackingN
             easing: 'cubic-bezier(.03,.98,.52,.99)',
             }}
         >
-            <Card className=" h-45" style={{ border: "0.5px solid green" }}>
+            <Card className=" h-45" 
+             style={{ border: "0.5px solid green" }}>
                 <CardContent>
                     <Typography variant="h5" component="h2">
                         {name}

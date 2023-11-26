@@ -1,68 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import initRestaurants from '../../data/restaurants.json';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import RestaurantCard from './restaurantCard';
-import axios from 'axios';
-import Papa from 'papaparse';
-
-// function patchData(reports, restaurants) {
-//     restaurants.forEach(restaurant => {
-//       restaurant.reports = reports.filter(report => report.trackingNumber === restaurant.trackingNumber);
-//     });
-//     return restaurants;
-// }
-
-function patchData(reports, restaurants) {
-    let reportHashMap= new Map();
-    reports.forEach(report => {
-        if(!reportHashMap.has(report.TRACKINGNUMBER)){
-            reportHashMap.set(report.TRACKINGNUMBER, [report]);
-        } else {
-            reportHashMap.get(report.TRACKINGNUMBER).push(report);
-        }
-    });
-    restaurants.forEach((restaurant) => {
-        if(reportHashMap.has(restaurant.properties.TRACKINGNUMBER)){
-            restaurant.properties.reports = reportHashMap.get(restaurant.properties.TRACKINGNUMBER);
-        }
-    });
-    return restaurants;
-}
+import { useSelector } from 'react-redux';
 
 export const ListView = () => {
-    // eslint-disable-next-line
-    const [totalRestaurants, setTotalRestaurants] = useState(initRestaurants.features);
+    const totalRestaurants = useSelector((state) => state.totalRestaurants);
     const [visibleRes, setVisibleRes] = useState(totalRestaurants.slice(0,20));
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(true)
 
-    const [reports, setReports] = useState([])
-
     useEffect(() => {
-        axios.get(process.env.PUBLIC_URL + '/data/fraser_health_restaurant_inspection_reports.csv')
-          .then(response => {
-            const parsedData = Papa.parse(response.data, { header: true });
-            const reports = parsedData.data.map(row => ({
-                TRACKINGNUMBER: row.TRACKINGNUMBER,
-                INSPECTIONDATE: row.INSPECTIONDATE,
-                INSPTYPE: row.INSPTYPE,
-                NUMCRITICAL: row.NUMCRITICAL,
-                NUMNONCRITICAL: row.NUMNONCRITICAL,
-                VIOLLUMP: row.VIOLLUMP,
-                HAZARDRATING: row.HAZARDRATING,
-            }));
-    
-            setReports(reports);
-          });
-    }, []);
-    
-    useEffect(() => {
-        if(reports.length>0){
-            const patchedData = patchData(reports, totalRestaurants);
-            setTotalRestaurants(patchedData);
+        if(totalRestaurants.length>0){
             setLoading(false);
         }
-    }, [reports, totalRestaurants]);
+    }, [totalRestaurants]);
 
     const fetchMoreData = () => {
         const nextRestaurants = fetchNextRestaurants();
