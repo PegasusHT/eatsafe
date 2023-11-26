@@ -15,7 +15,7 @@ function patchData(reports, restaurants) {
       reportHashMap.get(report.TRACKINGNUMBER).push(report);
     }
   });
-  restaurants.forEach((restaurant) => {
+  restaurants.forEach((restaurant) => { 
     if (reportHashMap.has(restaurant.properties.TRACKINGNUMBER)) {
       restaurant.properties.reports = reportHashMap.get(restaurant.properties.TRACKINGNUMBER);
     }
