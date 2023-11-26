@@ -3,24 +3,39 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Papa from 'papaparse';
 import { GoogleMap, useJsApiLoader, Marker, MarkerClusterer, InfoWindowF } from '@react-google-maps/api';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate } from 'react-router-dom';
+import { setTotalRestaurants, setReports } from '../../redux/store/store';
+import { useDispatch, useSelector } from 'react-redux';
 
 function patchData(reports, restaurants) {
-  let reportHashMap = new Map();
-  reports.forEach(report => {
+  const reportHashMap = new Map();
+
+  reports.forEach((report) => {
     if (!reportHashMap.has(report.TRACKINGNUMBER)) {
       reportHashMap.set(report.TRACKINGNUMBER, [report]);
     } else {
-      reportHashMap.get(report.TRACKINGNUMBER).push(report);
+      const existingReports = reportHashMap.get(report.TRACKINGNUMBER);
+      reportHashMap.set(report.TRACKINGNUMBER, [...existingReports, report]);
     }
   });
-  restaurants.forEach((restaurant) => {
-    if (reportHashMap.has(restaurant.properties.TRACKINGNUMBER)) {
-      restaurant.properties.reports = reportHashMap.get(restaurant.properties.TRACKINGNUMBER);
+
+  const patchedRestaurants = restaurants.map((restaurant) => {
+    const patch = reportHashMap.get(restaurant.properties.TRACKINGNUMBER);
+
+    if (patch) {
+      return {
+        ...restaurant,
+        properties: {
+          ...restaurant.properties,
+          reports: patch,
+        },
+      };
     }
+
+    return restaurant;
   });
-  return restaurants;
+
+  return patchedRestaurants;
 }
 
 const center = {
@@ -36,9 +51,10 @@ const containerStyle = {
 
 export const MapView = () => {
   // eslint-disable-next-line
-  const [totalRestaurants, setTotalRestaurants] = useState([]);
-  const [reports, setReports] = useState([]);
+  const [totalRestaurants, setTotalRestaurantsState] = useState([]);
+  const [reports, setReportsState] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -69,14 +85,16 @@ export const MapView = () => {
           HAZARDRATING: row.HAZARDRATING,
         }));
 
-        setReports(reports);
+        setReportsState(reports);
+        dispatch(setReports(reports));
       });
   }, []);
 
   useEffect(() => {
     if (reports.length > 0) {
       const patchedData = patchData(reports, initRestaurants.features);
-      setTotalRestaurants(patchedData);
+      setTotalRestaurantsState(patchedData);
+      dispatch(setTotalRestaurants(patchedData));
     }
   }, [reports]);
 
