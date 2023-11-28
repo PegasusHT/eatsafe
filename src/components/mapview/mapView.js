@@ -114,7 +114,6 @@ export const MapView = () => {
     >
       <Box
         mt={'3vh'}
-        mr={'40vw'}
         bgColor='white'
         zIndex='1'
       >
